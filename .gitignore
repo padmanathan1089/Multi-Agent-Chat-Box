@@ -1,0 +1,21 @@
+# Virtual Environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# Vector database
+vectorstore/
+
+# VS Code settings
+.vscode/
+
+# Streamlit cache
+.streamlit/
+
+# OS files
+.DS_Store
