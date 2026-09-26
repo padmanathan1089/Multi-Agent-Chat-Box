@@ -1,27 +1,49 @@
 import streamlit as st
-from langgraph_workflow import app
+from langgraph_workflow import app as workflow_app
 
 st.set_page_config(
     page_title="Multi-Agent AI Chatbot",
     page_icon="🤖",
+    layout="centered"
 )
 
 st.title("🤖 Multi-Agent AI Chatbot")
-st.write("Ask questions from the Employee Handbook or ask general AI questions.")
+st.caption("Ask questions from the Employee Handbook or ask general AI questions.")
 
-question = st.text_input("Enter your question")
+# Initialize chat history in session state
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-if st.button("Ask"):
+# Display all previous messages
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
 
-    if question.strip():
+# Chat input box (fixed at bottom, like ChatGPT)
+question = st.chat_input("Ask your question...")
 
+if question:
+    # Show user message immediately
+    st.session_state.messages.append({"role": "user", "content": question})
+    with st.chat_message("user"):
+        st.markdown(question)
+
+    # Get AI response
+    with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-
-            result = app.invoke({
+            result = workflow_app.invoke({
                 "question": question,
                 "answer": ""
             })
+            answer = result["answer"]
+            st.markdown(answer)
 
-        st.success("Answer")
+    # Save AI response to history
+    st.session_state.messages.append({"role": "assistant", "content": answer})
 
-        st.write(result["answer"])
+# Optional: clear chat button in sidebar
+with st.sidebar:
+    st.header("Options")
+    if st.button("🗑️ Clear Chat"):
+        st.session_state.messages = []
+        st.rerun()
